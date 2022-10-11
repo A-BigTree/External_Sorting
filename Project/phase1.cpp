@@ -212,9 +212,7 @@ void ikjOrder() {
 	delete[]a;
 }
 
-
-
-
+/*
 int main() {
 	//writeMatrix("matrix_A_10.txt");
 	//writeMatrix("matrix_B_10.txt");
@@ -231,4 +229,4 @@ int main() {
 	
 
 	return 0;
-}
+}*/
