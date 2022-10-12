@@ -1,6 +1,7 @@
 #include<iostream>
 #include<set>
 #include<fstream>
+#include<string>
 #include"BufferManage.cpp"
 
 using namespace std;
@@ -123,21 +124,45 @@ string RESULT_FILE = "data//phase2//QuckSortResult.txt";
 //记录I/O次数
 int IO_TIME = 0;
 
+//数据长度
+const int INT_LENGTH = 8;
+
 
 /*----------------具体函数---------------------*/
 
 //生成测试数据
 void createTestData(int sum) {
-	ofstream file;
+	ofstream file, file_re;
 	file.open(DATA_FILE, ios::out);
+	file_re.open(RESULT_FILE, ios::out);
 
-	if (!file.fail()) {
+	if (!file.fail() && !file_re.fail()) {
 		for (int i = 0; i < sum; i++) {
-			file << rand() % 1000 << endl;
+			file << rand() << endl;
+			for (int i = 0; i < INT_LENGTH; i++) {
+				file_re << 0;
+			}
+			file_re << endl;
 		}
 	}
 	file.close();
+	file_re.close();
 }
+
+//整数转为8位字符串
+char* intToString(int num) {
+	char* str = new char[INT_LENGTH + 1];
+	fill(str, str + INT_LENGTH, '0');
+	str[INT_LENGTH] = '\0';
+
+	string intS = to_string(num);
+	for (int i = 0; i < intS.length(); i++) {
+		str[INT_LENGTH - intS.length() + i] = intS[i];
+	}
+	return str;
+}
+
+
 
 //读入INPUT
 void readInput(string &filePath, int index) {
@@ -214,14 +239,19 @@ int main() {
 
 	//createTestData(1000);
 	fstream file;
-	file.open("data//phase2//test.txt", ios::in | ios::out);
+	file.open("data//phase2//test.txt", ios::out | ios::in);
 
+	int index = 5;
 	int temp;
-	file >> temp;
-	cout << temp << endl;
-	file.write("0\n", 3);
-	file.write("0\n", 3);
-	file.close();
+	for (int i = 0; i < index; i++) {
+		file >> temp;
+	}
 
+	file.seekp(file.tellg(), ios::beg);
+	char* temp = intToString(56789);
+	for (int i = 0; i < INT_LENGTH; i++) {
+		file << to_string(temp);
+	}
+	
 	return 0;
 }
