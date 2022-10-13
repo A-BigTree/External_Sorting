@@ -282,7 +282,7 @@ void writeMiddle(ofstream &file, int index) {
 }
 
 //文件复制
-void copyFile(string inputFile, string outputFile, ios_base::openmode _Mode = ios::out) {
+void copyFile(string inputFile, string outputFile, int num, ios_base::openmode _Mode = ios::out) {
 
 	IO_TIME++;
 
@@ -297,7 +297,7 @@ void copyFile(string inputFile, string outputFile, ios_base::openmode _Mode = io
 	}
 
 	int temp;
-	while (!ifile.eof()) {
+	for (int i = 0; i < num; i++) {
 		ifile >> temp;
 		ofile << temp << endl;
 	}
@@ -343,15 +343,18 @@ class ExternalQuickSort {
 private:
 	//middle写
 	ofstream middleFile;
+	//记录缓存数据数目
+	int sum;
 
 public:
 	ExternalQuickSort() {
 		middleFile.open(CACHE_MIDDLE, ios::out);
+		sum = MAX_SUM;
 	}
 
 
 	//实现函数
-	void quickSort(int left, int right, int startIndex, int dataSum) {
+	void quickSort(int left, int right, int startIndex) {
 		
 		//清空small.txt、large.txt
 		ofstream file;
@@ -361,7 +364,7 @@ public:
 		file.close();
 
 		cout << "left:right " << left << ":" << right << endl;
-		cout << "Data sum:" << dataSum << endl;
+		cout << "Data sum:" << sum << endl;
 		cout << "Cache start index:" << startIndex << endl <<endl;
 
 		//记录相对读取结束位置
@@ -440,23 +443,32 @@ public:
 		writeMiddle(middleFile, left + rs);
 
 		//small、large文件复制到缓存文件中
-		copyFile(CACHE_SMALL, CACHE_TEMP, ios::app);
-		copyFile(CACHE_LARGE, CACHE_TEMP, ios::app);
+		copyFile(CACHE_SMALL, CACHE_TEMP, rs, ios::app);
+		copyFile(CACHE_LARGE, CACHE_TEMP, rl, ios::app);
 
-		quickSort(left, left + rs, dataSum, dataSum + rs + rl);
-		quickSort(right - rl, right, dataSum + rs, dataSum + rs + rl);
+		int dataSum = sum;
+		sum += (rs + rl);
+
+		quickSort(left, left + rs, dataSum);
+		quickSort(right - rl, right, dataSum + rs);
 
 	}
 
 	//运行函数
 	void run() {
 		//copy数据到缓存文件
-		copyFile(DATA_FILE, CACHE_TEMP, ios::out);
+		copyFile(DATA_FILE, CACHE_TEMP, MAX_SUM, ios::out);
 		//进行外部排序
-		this->quickSort(0, MAX_SUM, 0, MAX_SUM);
+		this->quickSort(0, MAX_SUM, 0);
 		this->middleFile.close();
 		//cache->Result
 		cacheToResult();
+		//清空缓存文件
+		ofstream file;
+		file.open(CACHE_TEMP, ios::out);
+		file.close();
+		file.open(CACHE_MIDDLE, ios::out);
+		file.close();
 	}
 
 
@@ -465,6 +477,8 @@ public:
 
 
 int main() {
+
+	//createTestData();
 
 	ExternalQuickSort qs;
 	qs.run();
