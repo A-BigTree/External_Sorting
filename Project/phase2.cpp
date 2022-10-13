@@ -187,7 +187,7 @@ string intToString(int num) {
 }
 
 //读入INPUT
-bool readInput(string &filePath, int index, int left) {
+bool readInput(string& filePath, int index, int left) {
 
 	IO_TIME++;
 
@@ -218,7 +218,7 @@ bool readInput(string &filePath, int index, int left) {
 }
 
 //读入MIDDLE
-bool readMiddle(string &filePath, int right, int left){
+bool readMiddle(string& filePath, int right, int left) {
 
 	IO_TIME++;
 
@@ -477,11 +477,14 @@ public:
 
 
 int main() {
-
+	//生成测试数据
 	//createTestData();
 
 	ExternalQuickSort qs;
 	qs.run();
+
+	cout << "Data Size: " << MAX_SUM << endl;
+	cout << "I/O times: " << IO_TIME << endl;
 
 	return 0;
 }
