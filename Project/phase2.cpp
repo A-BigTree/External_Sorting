@@ -85,7 +85,7 @@ public:
 	}
 
 	//最小值出栈
-	T popMin() {	
+	T popMin() {
 		T temp = this->getMin();
 		this->delMin();
 		return temp;
@@ -140,8 +140,6 @@ string RESULT_FILE = "data//phase2//QuckSortResult.txt";
 
 //中间缓存文件路径
 string CACHE_TEMP = "data//phase2//cache//temp.txt";
-string CACHE_SMALL = "data//phase2//cache//small.txt";
-string CACHE_LARGE = "data//phase2//cache//large.txt";
 string CACHE_MIDDLE = "data//phase2//cache//middle.txt";
 
 //记录I/O次数
@@ -149,9 +147,6 @@ int IO_TIME = 0;
 
 //数据长度
 const int INT_LENGTH = 8;
-
-
-/*----------------具体函数---------------------*/
 
 //生成测试数据
 void createTestData() {
@@ -186,8 +181,9 @@ string intToString(int num) {
 	return str;
 }
 
+
 //读入INPUT
-bool readInput(string& filePath, int index, int left) {
+bool readInput(int index, int left) {
 
 	IO_TIME++;
 
@@ -195,30 +191,27 @@ bool readInput(string& filePath, int index, int left) {
 	INPUT.reset();
 
 	ifstream file;
-	file.open(filePath, ios::in);
+	file.open(CACHE_TEMP, ios::in);
 
-	int i = 0;
+	int i = index;
 
 	if (!file.fail()) {
-		int temp;
-		//找到对应位置
-		for (i; i < index; i++) {
-			file >> temp;
-		}
+		char temp[INT_LENGTH + 1];
 		//读入INPUT
-		while (!INPUT.isWriteOut() && !file.eof() && i < left) {
-			file >> temp;
-			INPUT.bufferInput(temp);
+		while (!INPUT.isWriteOut() && i < MAX_SUM && i < left) {
+			file.seekg(i * (INT_LENGTH + 1), ios::beg);
+			file.get(temp, INT_LENGTH + 1);
+			INPUT.bufferInput(stoi(temp));
 			i++;
 		}
 	}
 	file.close();
 
-	return file.eof() || i >= left;
+	return i >= MAX_SUM || i >= left;
 }
 
 //读入MIDDLE
-bool readMiddle(string& filePath, int right, int left) {
+bool readMiddle(int right, int left) {
 
 	IO_TIME++;
 
@@ -226,48 +219,27 @@ bool readMiddle(string& filePath, int right, int left) {
 	MIDDLE.clear();
 
 	ifstream file;
-	file.open(filePath, ios::in);
+	file.open(CACHE_TEMP, ios::in);
 
-	int i = 0;
+	int i = right;
 
 	if (!file.fail()) {
-		int temp;
+		char temp[INT_LENGTH + 1];
 
-		
-		for (i; i < right; i++) {
-			file >> temp;
-		}
-
-		while (!MIDDLE.isFull() && !file.eof() && i < left) {
+		while (!MIDDLE.isFull() && i < MAX_SUM && i < left) {
+			file.seekg(i * (INT_LENGTH + 1), ios::beg);
+			file.get(temp, INT_LENGTH + 1);
+			MIDDLE.insert(stoi(temp));
 			i++;
-			file >> temp;
-			MIDDLE.insert(temp);
 		}
 	}
+	file.close();
 
 	return file.eof() || i >= left;
 }
 
-//写Buffer
-void writerBuffer(string& filePath, BufferManage<int>& buffer) {
-
-	IO_TIME++;
-
-	ofstream file;
-	file.open(filePath, ios::app);
-
-	if (!file.fail()) {
-		while (!buffer.isReadOut()) {
-			file << buffer.bufferOutput() << endl;
-		}
-	}
-
-	file.close();
-	buffer.reset();
-}
-
 //在指定位置写MIDDLE
-void writeMiddle(ofstream &file, int index) {
+void writeMiddle(fstream& file, int index) {
 
 	IO_TIME++;
 
@@ -276,37 +248,70 @@ void writeMiddle(ofstream &file, int index) {
 	int size = MIDDLE.getSize();
 
 	for (int i = 0; i < size; i++) {
-		file << intToString(MIDDLE.popMin()) << " ";
+		file.write(intToString(MIDDLE.popMin()).append(" ").c_str(), INT_LENGTH + 1);
 	}
 
 }
 
-//文件复制
-void copyFile(string inputFile, string outputFile, int num, ios_base::openmode _Mode = ios::out) {
+//写Buffer
+void writerBuffer(fstream& file, BufferManage<int>& buffer, int index) {
 
+	IO_TIME++;
+
+	int i = index;
+
+	while (!buffer.isReadOut()) {
+		file.seekp((i++) * (INT_LENGTH + 1), ios::beg);
+		file.write(intToString(buffer.bufferOutput()).append(" ").c_str(), INT_LENGTH + 1);
+	}
+
+	buffer.reset();
+}
+
+
+//结果复制到Cache
+void copyCache(fstream& file) {
+	IO_TIME++;
+
+	ofstream ofile;
+
+	ofile.open(CACHE_TEMP, ios::out);
+
+	char temp[INT_LENGTH + 1];
+	for (int i = 0; i < MAX_SUM; i++) {
+		file.seekg(i * (INT_LENGTH + 1), ios::beg);
+		file.get(temp, INT_LENGTH + 1);
+		ofile.seekp(i * (INT_LENGTH + 1), ios::beg);
+		ofile << intToString(stoi(temp)) << " ";
+	}
+	ofile.close();
+}
+
+//数据写入Cache
+void dataToCache() {
 	IO_TIME++;
 
 	ifstream ifile;
 	ofstream ofile;
 
-	ifile.open(inputFile, ios::in);
-	ofile.open(outputFile, _Mode);
+	ifile.open(DATA_FILE, ios::in);
+	ofile.open(CACHE_TEMP, ios::out);
 
 	if (ifile.fail() || ofile.fail()) {
 		return;
 	}
 
 	int temp;
-	for (int i = 0; i < num; i++) {
+	for (int i = 0; i < MAX_SUM; i++) {
 		ifile >> temp;
-		ofile << temp << endl;
+		ofile << intToString(temp) << " ";
 	}
 
 	ifile.close();
 	ofile.close();
 }
 
-//middle缓存写入结果文件
+//缓存写入结果文件
 void cacheToResult() {
 
 	IO_TIME++;
@@ -342,49 +347,35 @@ class ExternalQuickSort {
 
 private:
 	//middle写
-	ofstream middleFile;
-	//记录缓存数据数目
-	int sum;
+	fstream middleFile;
 
 public:
 	ExternalQuickSort() {
-		middleFile.open(CACHE_MIDDLE, ios::out);
-		sum = MAX_SUM;
+		middleFile.open(CACHE_MIDDLE, ios::out | ios::in);
 	}
 
 
 	//实现函数
-	void quickSort(int left, int right, int startIndex) {
-		
-		//清空small.txt、large.txt
-		ofstream file;
-		file.open(CACHE_SMALL, ios::out);
-		file.close();
-		file.open(CACHE_LARGE, ios::out);
-		file.close();
+	void quickSort(int left, int right) {
 
-		cout << "left:right " << left << ":" << right << endl;
-		cout << "Data sum:" << sum << endl;
-		cout << "Cache start index:" << startIndex << endl <<endl;
+		cout << "left:right " << left << ":" << right << endl << endl;
 
-		//记录相对读取结束位置
-		int endIndex = startIndex + right - left;
 
 		//填充middle
-		if (readMiddle(CACHE_TEMP, startIndex, endIndex)) {
+		if (readMiddle(left, right)) {
 			writeMiddle(middleFile, left);
 			return;
 		}
 
-		//记录small、large缓存数量
-		int rs = 0, rl = 0;
+		//记录small、large缓存位置
+		int rs = left, rl = right;
 
 		//记录Input读取位置
-		int indexIn = startIndex + MIDDLE.getSize();
+		int indexIn = left + MIDDLE.getSize();
 
 		while (true) {
 			//读入INPUT缓存
-			bool flag = readInput(CACHE_TEMP, indexIn, endIndex);
+			bool flag = readInput(indexIn, right);
 			//更新下一次读取位置
 			indexIn += INPUT.getPosW();
 
@@ -394,33 +385,38 @@ public:
 
 				if (temp <= MIDDLE.getMin()) {//小于等于middle最小值
 					SMALL.bufferInput(temp);
-					rs++;
 
-				}else if (temp >= MIDDLE.getMax()) {//大于等于middle最大值
+				}
+				else if (temp >= MIDDLE.getMax()) {//大于等于middle最大值
 					LARGE.bufferInput(temp);
-					rl++;
 
-				}else {//处于中间值
+				}
+				else {//处于中间值
 
 					if (SMALL.getPosW() <= LARGE.getPosW()) {//SAMLL缓存区数目较少
 						SMALL.bufferInput(MIDDLE.popMin());
 						MIDDLE.insert(temp);
-						rs++;
 
-					}else {//LARGR缓存区数目少
+					}
+					else {//LARGR缓存区数目少
 						LARGE.bufferInput(MIDDLE.popMax());
 						MIDDLE.insert(temp);
-						rl++;
+
 					}
 
 				}
 
 				//判断SMALL、LARGR是否需要写回
 				if (SMALL.isWriteOut()) {
-					writerBuffer(CACHE_SMALL, SMALL);
+					int size = SMALL.getPosW();
+					writerBuffer(middleFile, SMALL, rs);
+					rs += size;
+
 				}
 				if (LARGE.isWriteOut()) {
-					writerBuffer(CACHE_LARGE, LARGE);
+					int size = LARGE.getPosW();
+					writerBuffer(middleFile, LARGE, rl - size);
+					rl -= size;
 				}
 			}
 
@@ -436,45 +432,44 @@ public:
 		cout << "small:" << rs << " large: " << rl << " sum: " << rs + rl << endl << endl;
 
 		//写剩余的small、large
-		writerBuffer(CACHE_SMALL, SMALL);
-		writerBuffer(CACHE_LARGE, LARGE);
+		int size = SMALL.getPosW();
+		writerBuffer(middleFile, SMALL, rs);
+		rs += size;
+		size = LARGE.getPosW();
+		writerBuffer(middleFile, LARGE, rl - size);
+		rl -= size;
 
 		//写middle
-		writeMiddle(middleFile, left + rs);
+		writeMiddle(middleFile, rs);
 
-		//small、large文件复制到缓存文件中
-		copyFile(CACHE_SMALL, CACHE_TEMP, rs, ios::app);
-		copyFile(CACHE_LARGE, CACHE_TEMP, rl, ios::app);
+		//复制文件
+		copyCache(middleFile);
 
-		int dataSum = sum;
-		sum += (rs + rl);
-
-		quickSort(left, left + rs, dataSum);
-		quickSort(right - rl, right, dataSum + rs);
+		quickSort(left, rs);
+		quickSort(rl, right);
 
 	}
 
 	//运行函数
 	void run() {
 		//copy数据到缓存文件
-		copyFile(DATA_FILE, CACHE_TEMP, MAX_SUM, ios::out);
+		dataToCache();
 		//进行外部排序
-		this->quickSort(0, MAX_SUM, 0);
+		this->quickSort(0, MAX_SUM);
 		this->middleFile.close();
 		//cache->Result
 		cacheToResult();
 		//清空缓存文件
-		ofstream file;
-		file.open(CACHE_TEMP, ios::out);
-		file.close();
-		file.open(CACHE_MIDDLE, ios::out);
-		file.close();
+		//ofstream file;
+		//file.open(CACHE_TEMP, ios::out);
+		//file.close();
+		//file.open(CACHE_MIDDLE, ios::out);
+		//file.close();
 	}
-
-
 };
 
 
+/*------------------------主函数-------------------------*/
 
 int main() {
 	//生成测试数据
