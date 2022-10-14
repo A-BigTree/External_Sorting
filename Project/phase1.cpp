@@ -1,3 +1,5 @@
+//Warm up
+
 #include"BufferManage.cpp"
 #include<iostream>
 #include<fstream>

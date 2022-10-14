@@ -1,3 +1,5 @@
+//External Sort: Quick Sort
+
 #include<iostream>
 #include<set>
 #include<fstream>
@@ -6,13 +8,11 @@
 
 using namespace std;
 
-
 /*------------------双端优先队列-----------------*/
 
 //双端优先队列
 template<typename T>
 class DoubleEndedPriorityQueue {
-
 private:
 	//多元素集合
 	multiset<T> m_set;
@@ -24,7 +24,6 @@ public:
 	DoubleEndedPriorityQueue() {
 		maxCapacity = 0;
 	}
-
 
 	//构造函数2
 	DoubleEndedPriorityQueue(int capacity) {
@@ -111,7 +110,6 @@ public:
 	void clear() {
 		m_set.clear();
 	}
-
 };
 
 /*----------------全局变量-----------------------*/
@@ -181,10 +179,8 @@ string intToString(int num) {
 	return str;
 }
 
-
 //读入INPUT
 bool readInput(int index, int left) {
-
 	IO_TIME++;
 
 	//重置INPIUT读写指针
@@ -212,7 +208,6 @@ bool readInput(int index, int left) {
 
 //读入MIDDLE
 bool readMiddle(int right, int left) {
-
 	IO_TIME++;
 
 	//清空set
@@ -240,7 +235,6 @@ bool readMiddle(int right, int left) {
 
 //在指定位置写MIDDLE
 void writeMiddle(fstream& file, int index) {
-
 	IO_TIME++;
 
 	file.seekp(index * (INT_LENGTH + 1), ios::beg);
@@ -250,12 +244,10 @@ void writeMiddle(fstream& file, int index) {
 	for (int i = 0; i < size; i++) {
 		file.write(intToString(MIDDLE.popMin()).append(" ").c_str(), INT_LENGTH + 1);
 	}
-
 }
 
 //写Buffer
 void writerBuffer(fstream& file, BufferManage<int>& buffer, int index) {
-
 	IO_TIME++;
 
 	int i = index;
@@ -267,7 +259,6 @@ void writerBuffer(fstream& file, BufferManage<int>& buffer, int index) {
 
 	buffer.reset();
 }
-
 
 //结果复制到Cache
 void copyCache(fstream& file) {
@@ -313,7 +304,6 @@ void dataToCache() {
 
 //缓存写入结果文件
 void cacheToResult() {
-
 	IO_TIME++;
 
 	ifstream ifile;
@@ -339,12 +329,10 @@ void cacheToResult() {
 	ofile.close();
 }
 
-
 /*-----------------------外部快排解决方法--------------------------*/
 
 //外部快速排序
 class ExternalQuickSort {
-
 private:
 	//middle写
 	fstream middleFile;
@@ -354,12 +342,9 @@ public:
 		middleFile.open(CACHE_MIDDLE, ios::out | ios::in);
 	}
 
-
 	//实现函数
 	void quickSort(int left, int right) {
-
 		cout << "left:right " << left << ":" << right << endl << endl;
-
 
 		//填充middle
 		if (readMiddle(left, right)) {
@@ -385,25 +370,19 @@ public:
 
 				if (temp <= MIDDLE.getMin()) {//小于等于middle最小值
 					SMALL.bufferInput(temp);
-
 				}
 				else if (temp >= MIDDLE.getMax()) {//大于等于middle最大值
 					LARGE.bufferInput(temp);
-
 				}
 				else {//处于中间值
-
 					if (SMALL.getPosW() <= LARGE.getPosW()) {//SAMLL缓存区数目较少
 						SMALL.bufferInput(MIDDLE.popMin());
 						MIDDLE.insert(temp);
-
 					}
 					else {//LARGR缓存区数目少
 						LARGE.bufferInput(MIDDLE.popMax());
 						MIDDLE.insert(temp);
-
 					}
-
 				}
 
 				//判断SMALL、LARGR是否需要写回
@@ -411,7 +390,6 @@ public:
 					int size = SMALL.getPosW();
 					writerBuffer(middleFile, SMALL, rs);
 					rs += size;
-
 				}
 				if (LARGE.isWriteOut()) {
 					int size = LARGE.getPosW();
@@ -420,12 +398,10 @@ public:
 				}
 			}
 
-
 			//文件读取完成
 			if (flag) {
 				break;
 			}
-
 		}
 
 		cout << "left:right " << left << ":" << right << endl;
@@ -447,7 +423,6 @@ public:
 
 		quickSort(left, rs);
 		quickSort(rl, right);
-
 	}
 
 	//运行函数
@@ -460,14 +435,13 @@ public:
 		//cache->Result
 		cacheToResult();
 		//清空缓存文件
-		//ofstream file;
-		//file.open(CACHE_TEMP, ios::out);
-		//file.close();
-		//file.open(CACHE_MIDDLE, ios::out);
-		//file.close();
+		ofstream file;
+		file.open(CACHE_TEMP, ios::out);
+		file.close();
+		file.open(CACHE_MIDDLE, ios::out);
+		file.close();
 	}
 };
-
 
 /*------------------------主函数-------------------------*/
 

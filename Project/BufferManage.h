@@ -10,12 +10,12 @@ private:
 	int posR;
 	//写指针指向
 	int posW;
-	
+
 public:
 	//默认构造函数
 	BufferManage();
 
-	//构造函数1 
+	//构造函数1
 	BufferManage(int n);
 
 	//构造函数2
@@ -47,7 +47,7 @@ public:
 	bool isWriteOut();
 
 	//获取特定索引位置数据
-	T getIndexData(int index);
+	T getIndexData(int index, bool isPosR = true);
 
 	//修改特定索引位置数据
 	bool setIndexData(T data, int index);
@@ -66,5 +66,4 @@ public:
 
 	//释放缓冲区
 	void free();
-
 };

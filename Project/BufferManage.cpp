@@ -85,7 +85,7 @@ bool BufferManage<T>::isReadOut() {
 }
 
 template<typename T>
-bool BufferManage<T>::isWriteOut(){
+bool BufferManage<T>::isWriteOut() {
 	if (posW >= capcity) {
 		return true;
 	}
@@ -93,25 +93,29 @@ bool BufferManage<T>::isWriteOut(){
 }
 
 template<typename T>
-T BufferManage<T>::getIndexData(int index){
+T BufferManage<T>::getIndexData(int index, bool isPosR) {
 	if (index >= capcity) {
 		printf("Index(%d) is out of index(%d)\n", index, capcity - 1);
-		posR = capcity;
+		if (isPosR) {
+			posR = capcity;
+		}
 		return buffer[capcity - 1];
 	}
-	posR = index + 1;
+	if (isPosR) {
+		posR = index + 1;
+	}
 	return buffer[index];
 }
 
 template<typename T>
-bool BufferManage<T>::setIndexData(T data, int index){
+bool BufferManage<T>::setIndexData(T data, int index) {
 	if (index >= capcity) {
 		printf("Index(%d) is out of index(%d)\n", index, capcity - 1);
 		return false;
 	}
 	if (index > posW) {
 		posW = index + 1;
-	}  
+	}
 	buffer[index] = data;
 	return true;
 }
@@ -151,5 +155,3 @@ void BufferManage<T>::free()
 	posR = 0;
 	posW = 0;
 }
-
-
