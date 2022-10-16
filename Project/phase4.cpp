@@ -43,6 +43,10 @@ public:
 		MIN = _MIN;
 	}
 
+	void adjust(int index, T& data) {
+
+	}
+
 
 
 

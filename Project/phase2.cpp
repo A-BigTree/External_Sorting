@@ -148,21 +148,15 @@ const int INT_LENGTH = 8;
 
 //生成测试数据
 void createTestData() {
-	ofstream file, file_re;
+	ofstream file;
 	file.open(DATA_FILE, ios::out);
-	file_re.open(RESULT_FILE, ios::out);
 
-	if (!file.fail() && !file_re.fail()) {
+	if (!file.fail()) {
 		for (int i = 0; i < MAX_SUM; i++) {
 			file << rand() << endl;
-			for (int i = 0; i < INT_LENGTH; i++) {
-				file_re << 0;
-			}
-			file_re << endl;
 		}
 	}
 	file.close();
-	file_re.close();
 }
 
 //整数转为8位字符串
@@ -206,7 +200,7 @@ bool readInput(int index, int left) {
 	return i >= MAX_SUM || i >= left;
 }
 
-//读入MIDDLE
+//指定位置读入MIDDLE
 bool readMiddle(int right, int left) {
 	IO_TIME++;
 
