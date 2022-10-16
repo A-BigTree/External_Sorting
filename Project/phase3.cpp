@@ -39,10 +39,10 @@ int TIME_IO = 0;
 
 //生成测试数据
 void createData() {
-	ofstream file, file_re;
+	ofstream file;
 	file.open(DATA, ios::out);
 
-	if (!file.fail() && !file_re.fail()) {
+	if (!file.fail()) {
 		for (int i = 0; i < MAX_DATA_NUM; i++) {
 			file << rand() << endl;
 		}
@@ -84,11 +84,10 @@ bool readInput(BufferManage<int>& buffer, int index, int left) {
 		buffer.bufferInput(stoi(temp));
 	}
 
-file.close();
+	file.close();
 
-return i >= left;
+	return i >= left;
 }
-
 
 //指定位置写output
 void writeOutput(fstream& file, int index) {
@@ -123,7 +122,7 @@ void copyCache(fstream& file) {
 }
 
 //数据写入Cache
-void dataToCache(fstream &file) {
+void dataToCache(fstream& file) {
 	TIME_IO++;
 
 	ifstream ifile;
@@ -174,7 +173,6 @@ void cacheToResult() {
 	ofile.close();
 }
 
-
 /*------------------解决方法------------------*/
 
 class ExternalMergeSort {
@@ -189,7 +187,6 @@ public:
 
 	//外部Merge排序
 	void mergeSort(int left, int right) {
-
 		if (right <= left) {
 			return;
 		}
@@ -199,8 +196,8 @@ public:
 		mergeSort(left, mid);
 
 		mergeSort(mid + 1, right);
-		
-		cout << "Run->left: mid: right -> " << left << ": " << mid + 1 << ": " << right + 1 << endl << endl;
+
+		//cout << "Run->left: mid: right -> " << left << ": " << mid + 1 << ": " << right + 1 << endl << endl;
 
 		//写指针
 		int current_w = left;
@@ -233,7 +230,8 @@ public:
 				if (d0 <= d1) {//INPUT0小
 					data = INPUT0.bufferOutput();
 					i++;
-				}else {//INPUT1小
+				}
+				else {//INPUT1小
 					data = INPUT1.bufferOutput();
 					j++;
 				}
@@ -246,7 +244,6 @@ public:
 					writeOutput(file, current_w);
 					current_w += size;
 				}
-
 			}
 
 			//跳出循环
@@ -276,7 +273,7 @@ public:
 				if (flag0) {
 					break;
 				}
-			}	
+			}
 		}
 
 		//处理INPUT1剩余元素
@@ -322,14 +319,12 @@ public:
 		//middle→result
 		cacheToResult();
 		//清空缓存文件
-		file.open(CACHE, ios::out);
-		file.close();
-		file.open(CACHE_MIDDLE, ios::out);
-		file.close();
-
+		//file.open(CACHE, ios::out);
+		//file.close();
+		//file.open(CACHE_MIDDLE, ios::out);
+		//file.close();
 	}
 };
-
 
 /*-----------------------------主函数------------------------*/
 
@@ -346,6 +341,7 @@ int main() {
 
 	double time = (double)(end - start) / CLOCKS_PER_SEC;
 
+	printf("Data size: %d.\n", MAX_DATA_NUM);
 	printf("Cost time: %.4fs.\n", time);
 	printf("I/O times: %d.\n", TIME_IO);
 
