@@ -2,7 +2,6 @@
 
 using namespace std;
 
-
 /*----------------Min loser Tree-----------------*/
 
 template<typename T>
@@ -46,8 +45,5 @@ public:
 	void adjust(int index, T& data) {
 
 	}
-
-
-
 
 };

@@ -4,6 +4,7 @@
 #include<fstream>
 #include<string>
 #include<ctime>
+#include <algorithm>
 #include"BufferManage.cpp"
 
 using namespace std;
@@ -65,7 +66,7 @@ string int2String(int num) {
 }
 
 //指定位置读Input
-bool readInput(BufferManage<int>& buffer, int index, int left) {
+bool readInput(BufferManage<int>& buffer, int index, int right) {
 	TIME_IO++;
 
 	//清空buffer
@@ -78,7 +79,7 @@ bool readInput(BufferManage<int>& buffer, int index, int left) {
 
 	char temp[DATA_LENGTH + 1];
 
-	while (!buffer.isWriteOut() && i < left) {
+	while (!buffer.isWriteOut() && i < right) {
 		file.seekg((i++) * (DATA_LENGTH + 1), ios::beg);
 		file.get(temp, DATA_LENGTH + 1);
 		buffer.bufferInput(stoi(temp));
@@ -86,7 +87,7 @@ bool readInput(BufferManage<int>& buffer, int index, int left) {
 
 	file.close();
 
-	return i >= left;
+	return i >= right;
 }
 
 //指定位置写output
@@ -187,7 +188,14 @@ public:
 
 	//外部Merge排序
 	void mergeSort(int left, int right) {
-		if (right <= left) {
+		//可在你内存中进行排序
+		if (right + 1 - left <= OUTPUT_BUFFER) {
+
+			readInput(OUTPUT, left, right + 1);
+			sort(OUTPUT.getBuffer(), OUTPUT.getBuffer() + OUTPUT.getPosW());
+			writeOutput(file, left);
+			//copy缓存文件
+			copyCache(file);
 			return;
 		}
 
@@ -203,7 +211,7 @@ public:
 		int current_w = left;
 		//两个输入读指针
 		int current_r0 = left, current_r1 = mid + 1;
-
+		//判断输入是否读完
 		bool flag0 = false, flag1 = false;
 
 		int i = 0, j = 0;
@@ -319,10 +327,10 @@ public:
 		//middle→result
 		cacheToResult();
 		//清空缓存文件
-		//file.open(CACHE, ios::out);
-		//file.close();
-		//file.open(CACHE_MIDDLE, ios::out);
-		//file.close();
+		file.open(CACHE, ios::out);
+		file.close();
+		file.open(CACHE_MIDDLE, ios::out);
+		file.close();
 	}
 };
 
