@@ -12,15 +12,15 @@ using namespace std;
 /*----------------------全局变量--------------------*/
 
 //数据最大容量
-const int MAX_DATA_NUM = 500;
+const int MAX_DATA_NUM = 1000;
 
 //数据长度
 const int DATA_LENGTH = 8;
 
 //INPUT缓存区容量
-const int INPUT_BUFFER = 20;
+const int INPUT_BUFFER = 30;
 //Output缓存区容量
-const int OUTPUT_BUFFER = 40;
+const int OUTPUT_BUFFER = 60;
 
 //缓存区初始化
 BufferManage<int> INPUT0(INPUT_BUFFER);
@@ -188,7 +188,7 @@ public:
 
 	//外部Merge排序
 	void mergeSort(int left, int right) {
-		//可在你内存中进行排序
+		//可在内存中进行排序
 		if (right + 1 - left <= OUTPUT_BUFFER) {
 
 			readInput(OUTPUT, left, right + 1);
@@ -329,8 +329,8 @@ public:
 		//清空缓存文件
 		file.open(CACHE, ios::out);
 		file.close();
-		file.open(CACHE_MIDDLE, ios::out);
-		file.close();
+		//file.open(CACHE_MIDDLE, ios::out);
+		//file.close();
 	}
 };
 
@@ -338,7 +338,7 @@ public:
 
 int main() {
 	//生成数据
-	createData();
+	//createData();
 
 	clock_t start = clock();
 
@@ -350,6 +350,8 @@ int main() {
 	double time = (double)(end - start) / CLOCKS_PER_SEC;
 
 	printf("Data size: %d.\n", MAX_DATA_NUM);
+	printf("Input Buffer: %d.\n", INPUT_BUFFER);
+	printf("Output Buffer: %d.\n", OUTPUT_BUFFER);
 	printf("Cost time: %.4fs.\n", time);
 	printf("I/O times: %d.\n", TIME_IO);
 
