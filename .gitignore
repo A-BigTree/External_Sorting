@@ -38,3 +38,6 @@
 *.user
 .vs/
 x64/
+Project/data/phase3/result.txt
+Project/data/phase3/data.txt
+Project/data/phase3/middle.txt
