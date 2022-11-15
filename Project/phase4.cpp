@@ -42,8 +42,24 @@ public:
 		MIN = _MIN;
 	}
 
-	void adjust(int index, T& data) {
-
+	void adjust(int index) {
+		int t = (index + LENGTH) / 2;
+		while (t > 0) {
+			if (buffer[index] > buffer[ls[t]]) {
+				ls[t] ^= index;
+				index ^= ls[t];
+				ls[t] ^= index;
+			}
+			t /= 2;
+		}
+		ls[0] = index;
 	}
 
+	void build() {
+		buffer[LENGTH] = MIN;
+		fill(ls, ls + LENGTH + 1, LENGTH);
+		for (int i = 0; i < LENGTH; ++i) {
+			adjust(i);
+		}
+	}
 };
